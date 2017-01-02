@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using DateTimeExtensions.NaturalText;
+using DateTimeExtensions.WorkingDays;
 
 namespace DateTimeExtensions.Tests
 {
@@ -122,6 +123,19 @@ namespace DateTimeExtensions.Tests
             Assert.IsNotNullOrEmpty(naturalText_single);
             Assert.AreEqual("2 journées, 2 heures, 2 minutes, 2 seconds", naturalText_plural);
             Assert.AreEqual("1 jour, 1 heure, 1 minute, 1 second", naturalText_single);
+        }
+
+        [Test]
+        public void get_easter_2010() {
+
+            var holiday = new EasterBasedHoliday("Easter", 0);
+            Assert.AreEqual(new DateTime(2016, 5,1), holiday.GetInstance(2016));
+            Assert.AreEqual(new DateTime(2051, 5, 7), holiday.GetInstance(2051));
+
+            Assert.AreEqual(new DateTime(2095, 4, 24), holiday.GetInstance(2095));
+            
+            
+
         }
     }
 }
