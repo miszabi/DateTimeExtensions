@@ -28,24 +28,30 @@ namespace DateTimeExtensions.WorkingDays
     public class EasterBasedHoliday : Holiday
     {
         private int daysOffset;
-        private IDictionary<int, DateTime> dayCache;
+        private bool isOrtodoxEaster;
+        private const string DAYCACHEKEY = "{0}_{1}";
 
-        public EasterBasedHoliday(string name, int daysOffset)
+        private IDictionary<string, DateTime> dayCache;
+        
+        public EasterBasedHoliday(string name, int daysOffset, bool isOrtodoxEaster = false)
             : base(name)
         {
             this.daysOffset = daysOffset;
-            dayCache = new Dictionary<int, DateTime>();
+            this.isOrtodoxEaster = isOrtodoxEaster;
+            dayCache = new Dictionary<string, DateTime>();
         }
 
         public override DateTime? GetInstance(int year)
         {
-            if (dayCache.ContainsKey(year))
+            if (dayCache.ContainsKey(string.Format(DAYCACHEKEY, year, isOrtodoxEaster)))
             {
-                return dayCache[year];
+                return dayCache[string.Format(DAYCACHEKEY, year, isOrtodoxEaster)];
             }
-            var easter = EasterCalculator.CalculateEasterDate(year);
+
+            DateTime easter = EasterCalculator.CalculateEasterDate(year, isOrtodoxEaster);
+            
             var date = easter.AddDays(daysOffset);
-            dayCache.Add(year, date);
+            dayCache.Add(string.Format(DAYCACHEKEY, year, isOrtodoxEaster), date);
             return date;
         }
 
@@ -57,22 +63,34 @@ namespace DateTimeExtensions.WorkingDays
 
         public static class EasterCalculator
         {
-            private static IDictionary<int, DateTime> easterPerYear;
+            private static IDictionary<string, DateTime> easterPerYear;
 
             static EasterCalculator()
             {
-                easterPerYear = new Dictionary<int, DateTime>();
+                easterPerYear = new Dictionary<string, DateTime>();
             }
 
-            public static DateTime CalculateEasterDate(int year)
+            public static DateTime CalculateEasterDate(int year, bool isOrtodoxEaster)
             {
-                if (easterPerYear.ContainsKey(year))
+                if (easterPerYear.ContainsKey(string.Format(DAYCACHEKEY, year, isOrtodoxEaster)))
                 {
-                    return easterPerYear[year];
+                    return easterPerYear[string.Format(DAYCACHEKEY, year, isOrtodoxEaster)];
                 }
-                var easter = GetEasterDate(year);
-                easterPerYear.Add(year, easter);
+
+                var easter = GetEasterDate(year, isOrtodoxEaster);
+                
+                easterPerYear.Add(string.Format(DAYCACHEKEY, year, isOrtodoxEaster), easter);
                 return easter;
+            }
+
+            private static DateTime GetEasterDate(int year, bool isOrtodoxEaster)
+            {
+                if (isOrtodoxEaster) 
+                {
+                    return GetOrthodoxEasterDate(year);
+                }
+
+                return GetEasterDate(year);
             }
 
             //Algoritm downloaded from http://tiagoe.blogspot.com/2007/10/easter-calculation-in-c.html
@@ -111,6 +129,23 @@ namespace DateTimeExtensions.WorkingDays
 
                     return new DateTime(year, f, g + 1);
                 }
+            }
+
+            private static DateTime GetOrthodoxEasterDate(int year)
+            {
+                int a = year % 19;
+                int b = year % 7;
+                int c = year % 4;
+
+                int d = (19 * a + 16) % 30;
+                int e = (2 * c + 4 * b + 6 * d) % 7;
+                int f = (19 * a + 16) % 30;
+                int key = f + e + 3;
+
+                int month = (key > 30) ? 5 : 4;
+                int day = (key > 30) ? key - 30 : key;
+
+                return new DateTime(year, month, day);
             }
         }
     }

@@ -7,8 +7,7 @@ using System.Text;
 namespace DateTimeExtensions.WorkingDays.CultureStrategies
 {
     [Locale("ro-RO")]
-    [Locale("ro-RO")]
-    public class RO_ROHolidayStrategy : HolidayStrategyBase, IHolidayStrategy
+   public class RO_ROHolidayStrategy : HolidayStrategyBase, IHolidayStrategy
     {
         public RO_ROHolidayStrategy()
         {

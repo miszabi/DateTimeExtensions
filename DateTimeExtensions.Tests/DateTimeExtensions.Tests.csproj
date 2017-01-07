@@ -53,6 +53,7 @@
     <Compile Include="ChristianHolidaysTests.cs" />
     <Compile Include="HolidaysTranslations\GermanHolidayNamesTest.cs" />
     <Compile Include="HolidaysTranslations\ViHolidaysNamesTest.cs" />
+    <Compile Include="ROHolidaysTests.cs" />
     <Compile Include="ViHolidaysTests.cs" />
     <Compile Include="HolidaysTranslations\KRHolidaysNamesTest.cs" />
     <Compile Include="KRHolidaysTests.cs" />
